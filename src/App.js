@@ -13,11 +13,12 @@ import Home from "./componentes/Home";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
+    <>
+      <header className="App-header">La Sala de Juntas</header>
+      <body className="body">
         <Home />
-      </header>
-    </div>
+      </body>
+    </>
   );
 }
 
