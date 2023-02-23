@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import ServiciosProducto from "../../servicios/producto.servicios";
-
-import { Sidebar } from "primereact/sidebar";
-import { Button } from "primereact/button";
-
-import BarraLateral from "../../comunes/BarraLateral/Index";
+import ServiciosProducto from "../../servicios/categoria.servicios";
 
 import MesasActivas from "../MesasActivas";
 import IngresarOrden from "../IngresarOrden";
