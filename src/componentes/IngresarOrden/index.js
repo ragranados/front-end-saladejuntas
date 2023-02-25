@@ -1,40 +1,47 @@
 import React, { useEffect, useState } from "react";
 
-import ServiciosProducto from "../../servicios/producto.servicios";
+import ServiciosMesa from "../../servicios/mesa.servicios";
+
 import "./index.css"
 
 import { Card } from 'primereact/card';
-
+import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 
 function IngresarOrden(props) {
 
   const [data, setData] = useState([]);
-  const [nuevaOrden, setNuevaOrden] = useState({ mesa: "", items: [], estado: "" });
+  const [nuevaOrden, setNuevaOrden] = useState({ mesa: null, items: [], estado: "" });
   const [mesas, setMesas] = useState([]);
+
+  const [mesa, setMesa] = useState(null);
 
   useEffect(() => {
 
-    const aux = [];
+    async function fetchData() {
 
-    for (let i = 0; i < 30; i++) {
-      aux.push({ label: i, value: i });
+      const infoMesas = await ServiciosMesa.obtenerMesasPorEstado("libre");
+
+      setMesas(infoMesas.data);
     }
 
-    setMesas();
+    fetchData();
 
   }, []);
 
+  const agregarItemOrden = (item) => {
+    console.log(item);
+  }
+
   useEffect(() => {
-    //console.log("data", data);
-  }, [data])
+    console.log(nuevaOrden);
+  }, [nuevaOrden])
 
   return (
     <div className="contenedor">
       <div className="contenedor-productos" style={{ marginLeft: "30px" }}>
         {props.dataCategorias.map((e) => {
 
-          console.log(e)
           return (
             <div >
               <div >
@@ -52,7 +59,7 @@ function IngresarOrden(props) {
                             return (
                               <div className="producto">
 
-                                <Card onClick={() => console.log("Click en tarjeta", e)} title={`${e.nombre}`}>
+                                <Card onClick={() => agregarItemOrden(e)} title={`${e.nombre}`}>
                                   <p className="m-0">
                                     {`Precio: $ ${e.precio}`}
                                   </p>
@@ -76,7 +83,8 @@ function IngresarOrden(props) {
       </div>
 
       <div className="contenedor-orden">
-
+        <Dropdown value={mesa} onChange={(e) => [setNuevaOrden({ ...nuevaOrden, mesa: e.value.id }), setMesa(e.value)]} options={mesas} optionLabel="id"
+          placeholder="Mesa de orden" className="w-full md:w-14rem" />
       </div>
     </div>
   )
