@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 
 import ServiciosMesa from "../../servicios/mesa.servicios";
+import utils from "../../utils";
+
+import Orden from "../Orden";
 
 import "./index.css"
 
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
+import { ScrollPanel } from 'primereact/scrollpanel';
 
 function IngresarOrden(props) {
 
@@ -18,19 +22,35 @@ function IngresarOrden(props) {
 
   useEffect(() => {
 
-    async function fetchData() {
+    async function fetchMesas() {
 
       const infoMesas = await ServiciosMesa.obtenerMesasPorEstado("libre");
 
       setMesas(infoMesas.data);
     }
 
-    fetchData();
+    fetchMesas();
+
+
+    let intervalo = setInterval(() => {
+      fetchMesas();
+    }, 4500);
+
+    return () => {
+
+      clearInterval(intervalo);
+
+    }
 
   }, []);
 
   const agregarItemOrden = (item) => {
     console.log(item);
+    let aux = nuevaOrden.items;
+
+    aux.push(item);
+
+    setNuevaOrden({ ...nuevaOrden, items: aux });
   }
 
   useEffect(() => {
@@ -40,52 +60,65 @@ function IngresarOrden(props) {
   return (
     <div className="contenedor">
       <div className="contenedor-productos" style={{ marginLeft: "30px" }}>
-        {props.dataCategorias.map((e) => {
+        <ScrollPanel style={{ width: '100%', maxHeight: '90vh' }}>
+          {props.dataCategorias.map((e) => {
 
-          return (
-            <div >
+            return (
               <div >
-                <h1>{e.nombre}</h1>
+                <div >
+                  <h1>{e.nombre}</h1>
 
-                {e.subCategories.map((e) => {
-                  return (
-                    <div style={{ marginLeft: "20px" }}>
-                      <h2>{e.nombre}</h2>
+                  {e.subCategories.map((e) => {
+                    return (
+                      <div style={{ marginLeft: "20px" }}>
+                        <h2>{e.nombre}</h2>
 
-                      <div className="contenedor-subcategorias">
+                        <div className="contenedor-subcategorias">
 
-                        {
-                          e.products.map((e) => {
-                            return (
-                              <div className="producto">
+                          {
+                            e.products.map((e) => {
+                              return (
+                                <div className="producto">
 
-                                <Card onClick={() => agregarItemOrden(e)} title={`${e.nombre}`}>
-                                  <p className="m-0">
-                                    {`Precio: $ ${e.precio}`}
-                                  </p>
-                                </Card>
+                                  <Card onClick={() => agregarItemOrden(e)} title={`${e.nombre}`}>
+                                    <p className="m-0">
+                                      {`Precio: $ ${e.precio}`}
+                                    </p>
+                                  </Card>
 
-                              </div>
-                            )
-                          })
-                        }
+                                </div>
+                              )
+                            })
+                          }
+                        </div>
+
                       </div>
+                    );
+                  })}
 
-                    </div>
-                  );
-                })}
+                </div>
 
               </div>
-
-            </div>
-          )
-        })}
+            )
+          })}
+        </ScrollPanel>
       </div>
 
       <div className="contenedor-orden">
+
         <Dropdown value={mesa} onChange={(e) => [setNuevaOrden({ ...nuevaOrden, mesa: e.value.id }), setMesa(e.value)]} options={mesas} optionLabel="id"
           placeholder="Mesa de orden" className="w-full md:w-14rem" />
+
+        <Orden items={utils.ordenarItemsParaMostrar(nuevaOrden.items)} />
+
+        <div className="contenedor-botones">
+          <Button className="botones" label="Guardar" />
+
+          <Button className="botones" label="Limpiar" />
+        </div>
+
       </div>
+
     </div>
   )
 }
