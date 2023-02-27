@@ -54,11 +54,11 @@ function IngresarOrden(props) {
     setNuevaOrden({ ...nuevaOrden, items: aux });
   }
 
-  const quitarUnItemOrden = (nombre) => {
+  const quitarUnItemOrden = (nombreEnFactura) => {
     let aux = nuevaOrden.items;
 
     const memberToRemove = aux.find(element => {
-      return element.nombre === nombre;
+      return element.nombreEnFactura === nombreEnFactura;
     });
 
     aux.splice(aux.indexOf(memberToRemove), 1);

@@ -5,9 +5,9 @@ utils.ordenarItemsParaMostrar = (listaItems) => {
     let arrayFinal = [];
 
     const agrupados = listaItems.reduce((group, product) => {
-        const { nombre } = product;
-        group[nombre] = group[nombre] ?? [];
-        group[nombre].push(product);
+        const { nombreEnFactura } = product;
+        group[nombreEnFactura] = group[nombreEnFactura] ?? [];
+        group[nombreEnFactura].push(product);
         return group;
     }, {});
     //console.log("lista", listaItems);
