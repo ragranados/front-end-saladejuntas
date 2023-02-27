@@ -12,9 +12,10 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { ScrollPanel } from 'primereact/scrollpanel';
 
+const ordenVacia = { mesa: null, items: [], estado: "" };
+
 function IngresarOrden(props) {
 
-  const [data, setData] = useState([]);
   const [nuevaOrden, setNuevaOrden] = useState({ mesa: null, items: [], estado: "" });
   const [mesas, setMesas] = useState([]);
 
@@ -33,7 +34,7 @@ function IngresarOrden(props) {
 
 
     let intervalo = setInterval(() => {
-      fetchMesas();
+      //fetchMesas();
     }, 4500);
 
     return () => {
@@ -53,8 +54,20 @@ function IngresarOrden(props) {
     setNuevaOrden({ ...nuevaOrden, items: aux });
   }
 
+  const quitarUnItemOrden = (nombre) => {
+    let aux = nuevaOrden.items;
+
+    const memberToRemove = aux.find(element => {
+      return element.nombre === nombre;
+    });
+
+    aux.splice(aux.indexOf(memberToRemove), 1);
+
+    setNuevaOrden({ ...nuevaOrden, items: aux });
+  }
+
   useEffect(() => {
-    console.log(nuevaOrden);
+    console.log("XDDDD", nuevaOrden);
   }, [nuevaOrden])
 
   return (
@@ -109,12 +122,14 @@ function IngresarOrden(props) {
         <Dropdown value={mesa} onChange={(e) => [setNuevaOrden({ ...nuevaOrden, mesa: e.value.id }), setMesa(e.value)]} options={mesas} optionLabel="id"
           placeholder="Mesa de orden" className="w-full md:w-14rem" />
 
-        <Orden items={utils.ordenarItemsParaMostrar(nuevaOrden.items)} />
+        <Orden quitarUnItemOrden={quitarUnItemOrden} items={utils.ordenarItemsParaMostrar(nuevaOrden.items)} />
 
         <div className="contenedor-botones">
           <Button className="botones" label="Guardar" />
 
-          <Button className="botones" label="Limpiar" />
+          <Button className="botones" label="Limpiar" onClick={() => {
+            setNuevaOrden({ mesa: null, items: [], estado: "" });
+          }} />
         </div>
 
       </div>
