@@ -31,6 +31,10 @@
     /* animation: all 500 ease */
 }
 
+.tarjeta-producto {
+    max-height: 150px;
+}
+
 .producto:active {
     opacity: 0.5;
 }

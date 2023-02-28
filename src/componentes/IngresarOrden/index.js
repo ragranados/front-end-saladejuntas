@@ -93,7 +93,7 @@ function IngresarOrden(props) {
                               return (
                                 <div className="producto">
 
-                                  <Card onClick={() => agregarItemOrden(e)} title={`${e.nombre}`}>
+                                  <Card className="tarjeta-producto" onClick={() => agregarItemOrden(e)} title={`${e.nombre}`}>
                                     <p className="m-0">
                                       {`Precio: $ ${e.precio}`}
                                     </p>
