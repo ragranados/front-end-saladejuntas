@@ -37,7 +37,6 @@ function IngresarOrden(props) {
 
     fetchMesas();
 
-
     let intervalo = setInterval(() => {
       fetchMesas(); //TODO: Descomentar
     }, 1000);
