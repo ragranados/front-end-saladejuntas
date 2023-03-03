@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import ServiciosMesa from "../../servicios/mesa.servicios";
+import ServiciosOrden from "../../servicios/orden.servicios";
 import utils from "../../utils";
+
+import { Toast } from 'primereact/toast';
 
 import Orden from "../Orden";
 
@@ -15,6 +18,8 @@ import { ScrollPanel } from 'primereact/scrollpanel';
 const ordenVacia = { mesa: null, items: [], estado: "" };
 
 function IngresarOrden(props) {
+
+  const toast = useRef(null);
 
   const [nuevaOrden, setNuevaOrden] = useState({ mesa: null, items: [], estado: "" });
   const [mesas, setMesas] = useState([]);
@@ -34,8 +39,8 @@ function IngresarOrden(props) {
 
 
     let intervalo = setInterval(() => {
-      //fetchMesas();
-    }, 4500);
+      fetchMesas(); //TODO: Descomentar
+    }, 1000);
 
     return () => {
 
@@ -66,12 +71,32 @@ function IngresarOrden(props) {
     setNuevaOrden({ ...nuevaOrden, items: aux });
   }
 
+  const limpiar = () => {
+    setMesa(null);
+    setNuevaOrden({ mesa: null, items: [], estado: "" });
+  }
+
+  const ingresarOrden = async () => {
+
+    const resIngresarOrden = await ServiciosOrden.ingresarOrden(nuevaOrden.mesa, nuevaOrden.items);
+
+    console.log("Orden Ingresada Respuesta", resIngresarOrden);
+
+    return resIngresarOrden;
+
+  }
+
   useEffect(() => {
     console.log("XDDDD", nuevaOrden);
   }, [nuevaOrden])
 
   return (
     <div className="contenedor">
+
+      <div className="card flex justify-content-center">
+        <Toast ref={toast} />
+      </div>
+
       <div className="contenedor-productos" style={{ marginLeft: "30px" }}>
         <ScrollPanel style={{ width: '100%', maxHeight: '90vh' }}>
           {props.dataCategorias.map((e) => {
@@ -125,10 +150,29 @@ function IngresarOrden(props) {
         <Orden quitarUnItemOrden={quitarUnItemOrden} items={utils.ordenarItemsParaMostrar(nuevaOrden.items)} />
 
         <div className="contenedor-botones">
-          <Button className="botones" label="Guardar" />
+          <Button className="botones" label="Guardar" onClick={async () => {
+
+            if (!nuevaOrden.items.length > 0 || !nuevaOrden.mesa) {
+
+              toast.current.show({ severity: 'warn', summary: 'Info', detail: 'No hay mesa especificada o items en la orden.' });
+              return;
+
+            }
+
+            const resIngresarOrden = await ingresarOrden();
+
+            if (!resIngresarOrden.ok) {
+              toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo ingresar la orden.' });
+            }
+
+            toast.current.show({ severity: 'success', summary: 'Exito', detail: 'Orden ingresada con exito.' });
+            console.log("Orden Ingresada con exito");
+            limpiar();
+
+          }} />
 
           <Button className="botones" label="Limpiar" onClick={() => {
-            setNuevaOrden({ mesa: null, items: [], estado: "" });
+            limpiar();
           }} />
         </div>
 
