@@ -15,7 +15,7 @@ servicios.ingresarOrden = async (mesa, items) => {
   return response.json();
 };
 
-servicios.obtenerOrdenesActivas = async (estado) => {
+servicios.obtenerOrdenesPorEstado = async (estado) => {
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/porEstado?estadoId=${estado}`, {
     method: "GET",
     headers: {
