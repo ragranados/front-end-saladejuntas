@@ -1,0 +1,54 @@
+.contenedor {
+    width: "100%";
+    display: flex;
+}
+
+.contenedor-productos {
+    width: 73%;
+}
+
+.contenedor-orden {
+    width: 28%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.contenedor-subcategorias {
+    margin-left: 20px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.producto {
+    flex-grow: 1;
+    width: 25%;
+    max-width: 25%;
+    margin: 15px;
+    /* opacity: 1; */
+    transition: opacity 0.05s linear 0s;
+    /* animation: all 500 ease */
+}
+
+.tarjeta-producto {
+    max-height: 150px;
+}
+
+.producto:active {
+    opacity: 0.5;
+}
+
+.contenedor-botones {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.botones {
+    max-width: 50%;
+}
+
+/* .p-scrollpanel-bar-x {
+    display: none;
+} */

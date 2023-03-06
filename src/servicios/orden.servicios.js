@@ -26,4 +26,48 @@ servicios.obtenerOrdenesPorEstado = async (estado) => {
   return response.json();
 };
 
+servicios.agregarAOrden = async (ordenId, items) => {
+  const response = await fetch(`${process.env.REACT_APP_URL}/orden/agregarAOrden`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ordenId,
+      items,
+    })
+  });
+
+  return response.json();
+}
+
+servicios.cambiarEstado = async (ordenId, estado) => {
+  const response = await fetch(`${process.env.REACT_APP_URL}/orden/cambiarEstado`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ordenId,
+      estado,
+    })
+  });
+
+  return response.json();
+}
+
+servicios.cerrarOrden = async (ordenId) => {
+  const response = await fetch(`${process.env.REACT_APP_URL}/orden/cerrar`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ordenId,
+    })
+  });
+
+  return response.json();
+}
+
 export default servicios;

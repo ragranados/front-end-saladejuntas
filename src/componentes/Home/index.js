@@ -36,7 +36,7 @@ function Home() {
         model={items}
       />
 
-      {activeIndex == 0 && <MesasActivas />}
+      {activeIndex == 0 && <MesasActivas dataCategorias={dataCategorias}/>}
       {activeIndex == 1 && <IngresarOrden dataCategorias={dataCategorias} />}
     </div>
   );
