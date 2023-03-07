@@ -56,7 +56,8 @@ servicios.cambiarEstado = async (ordenId, estado) => {
   return response.json();
 }
 
-servicios.cerrarOrden = async (ordenId) => {
+servicios.cerrarOrden = async (ordenId, metodoPagoId) => {
+  console.log({ ordenId, metodoPagoId });
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/cerrar`, {
     method: "PUT",
     headers: {
@@ -64,7 +65,19 @@ servicios.cerrarOrden = async (ordenId) => {
     },
     body: JSON.stringify({
       ordenId,
+      metodoPagoId
     })
+  });
+
+  return response.json();
+}
+
+servicios.obtenerMetodosDePago = async () => {
+  const response = await fetch(`${process.env.REACT_APP_URL}/orden/metodosDePago`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   return response.json();

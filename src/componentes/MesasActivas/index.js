@@ -9,8 +9,13 @@ import AgregarAOrden from "../AgregarAOrden";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+
 
 function MesasActivas(props) {
+  const [visiblePreCerrar, setVisiblePreCerrar] = useState(false);
+  const [visibleCerrar, setVisibleCerrar] = useState(false);
 
   const [ordenesActivas, setOrdenesActivas] = useState([]);
   const [ordenesPreCerradas, setOrdenesPreCerradas] = useState([]);
@@ -22,6 +27,9 @@ function MesasActivas(props) {
   const [ordenAModificar, setOrdenAModificar] = useState({});
 
   const [actualizar, setActualizar] = useState(true);
+
+  const [metodosPago, setMetodosPago] = useState([]);
+  const [metodoPago, setMetodoPago] = useState(null);
 
   useEffect(() => {
 
@@ -43,6 +51,34 @@ function MesasActivas(props) {
 
   }, [agregarAOrden, actualizar]);
 
+  useEffect(() => {
+
+    async function fetchData() {
+
+      const resObtenerMetodosDePago = await ServiciosOrden.obtenerMetodosDePago();
+      setMetodosPago(resObtenerMetodosDePago.data);
+
+    }
+
+    fetchData();
+
+  }, []);
+
+  const cerrarOrden = async () => {
+
+    console.log(metodoPago);
+
+    if (!metodoPago) {
+      return;
+    }
+
+    const resCerrarOrden = await ServiciosOrden.cerrarOrden(ordenAModificar.id, metodoPago);
+    setVisibleCerrar(false);
+    setMetodoPago(null);
+    setActualizar(!actualizar);
+
+  }
+
   const rowTemplate = (rowData) => {
     return (
       <div style={{ marginRight: "30px" }}>
@@ -61,7 +97,7 @@ function MesasActivas(props) {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button label="Agregar Items" onClick={() => [setOrdenAModificar(data), setAgregarAOrden(true)]} />
 
-            <Button label="Pre-cerrar orden" onClick={async () => [await ServiciosOrden.cambiarEstado(data.id, 2), setActualizar(!actualizar)]} />
+            <Button label="Pre-cerrar orden" onClick={() => [setOrdenAModificar(data), setVisiblePreCerrar(true)]} />
           </div>
 
           <DataTable value={data.orderItems}>
@@ -81,7 +117,7 @@ function MesasActivas(props) {
         <div style={{ width: "70%" }} >
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Button label="Cerrar Orden" onClick={async () => [await ServiciosOrden.cerrarOrden(data.id), setActualizar(!actualizar)]} />
+            <Button label="Cerrar Orden" onClick={async () => [setOrdenAModificar(data), setVisibleCerrar(true)]} />
           </div>
 
           <DataTable value={data.orderItems}>
@@ -93,8 +129,39 @@ function MesasActivas(props) {
     );
   };
 
+  const footerContentPreCerrar = (
+    <div>
+      <Button label="Cancelar" icon="pi pi-times" onClick={() => [setOrdenAModificar({}), setVisiblePreCerrar(false)]} className="p-button-text" />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [await ServiciosOrden.cambiarEstado(ordenAModificar.id, 2), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
+    </div>
+  );
+
+  const footerContentCerrar = (
+    <div>
+      <Button label="Cancelar" icon="pi pi-times" onClick={() => [setVisibleCerrar(false), setOrdenAModificar({}), setMetodoPago(null)]} className="p-button-text" />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [cerrarOrden()]} autoFocus />
+    </div>
+  );
+
   return (
     <div className="contenedor">
+
+      <Dialog footer={footerContentPreCerrar} header="Importante" visible={visiblePreCerrar} style={{ width: '50vw' }} onHide={() => setVisiblePreCerrar(false)}>
+        <p className="m-0">
+          Seguro que desea PRE-CERRAR la cuenta?
+        </p>
+      </Dialog>
+
+      <Dialog footer={footerContentCerrar} header="Header" visible={visibleCerrar} style={{ width: '50vw' }} onHide={() => setVisibleCerrar(false)}>
+        <p className="m-0">
+          Seguro que desea CERRAR la cuenta?
+        </p>
+
+        <h2>Escoger metodo de pago</h2>
+
+        <Dropdown options={metodosPago} value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} optionLabel="nombre" optionValue="id" />
+      </Dialog>
+
       {
         !agregarAOrden &&
         <div>
