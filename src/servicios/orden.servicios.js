@@ -56,6 +56,22 @@ servicios.cambiarEstado = async (ordenId, estado) => {
   return response.json();
 }
 
+servicios.preCerrarOrden = async (ordenId, metodoPagoId) => {
+  console.log({ ordenId, metodoPagoId });
+  const response = await fetch(`${process.env.REACT_APP_URL}/orden/PreCerrar`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ordenId,
+    })
+  });
+
+  return response.json();
+}
+
+
 servicios.cerrarOrden = async (ordenId, metodoPagoId) => {
   console.log({ ordenId, metodoPagoId });
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/cerrar`, {

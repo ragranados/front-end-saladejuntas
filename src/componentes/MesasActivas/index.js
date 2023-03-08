@@ -36,6 +36,7 @@ function MesasActivas(props) {
     async function fetchData() {
 
       const resObtenerOrdenesActivas = await ServiciosOrden.obtenerOrdenesPorEstado(1);
+      console.log("ordenes activas", resObtenerOrdenesActivas.data);
       setOrdenesActivas(resObtenerOrdenesActivas.data);
 
       const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(2);
@@ -63,6 +64,12 @@ function MesasActivas(props) {
     fetchData();
 
   }, []);
+
+  const preCerrarOrden = async () => {
+    const respreCerrarOrden = await ServiciosOrden.preCerrarOrden(ordenAModificar.id);
+    setVisiblePreCerrar(false);
+    setActualizar(!actualizar);
+  }
 
   const cerrarOrden = async () => {
 
@@ -132,7 +139,7 @@ function MesasActivas(props) {
   const footerContentPreCerrar = (
     <div>
       <Button label="Cancelar" icon="pi pi-times" onClick={() => [setOrdenAModificar({}), setVisiblePreCerrar(false)]} className="p-button-text" />
-      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [await ServiciosOrden.cambiarEstado(ordenAModificar.id, 2), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [preCerrarOrden(), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
     </div>
   );
 
@@ -173,7 +180,7 @@ function MesasActivas(props) {
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />
             <Column field="mesaId" header="Nro de mesa"></Column>
-            <Column field="total" header="Total"></Column>
+            <Column field="totalSinPropina" header="Total"></Column>
           </DataTable>
 
           <h3>Ordenes Pre-cerradas</h3>
