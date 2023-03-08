@@ -66,6 +66,7 @@ function MesasActivas(props) {
   }, []);
 
   const preCerrarOrden = async () => {
+    
     const respreCerrarOrden = await ServiciosOrden.preCerrarOrden(ordenAModificar.id);
     setVisiblePreCerrar(false);
     setActualizar(!actualizar);
