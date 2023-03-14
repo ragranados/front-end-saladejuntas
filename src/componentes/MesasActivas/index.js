@@ -11,6 +11,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
+import utils from "../../utils";
 
 
 function MesasActivas(props) {
@@ -36,7 +37,7 @@ function MesasActivas(props) {
     async function fetchData() {
 
       const resObtenerOrdenesActivas = await ServiciosOrden.obtenerOrdenesPorEstado(1);
-      console.log("ordenes activas", resObtenerOrdenesActivas.data);
+      console.log("ordenes activas", utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesActivas.data));
       setOrdenesActivas(resObtenerOrdenesActivas.data);
 
       const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(2);
@@ -175,7 +176,7 @@ function MesasActivas(props) {
 
           <h3>Ordenes activas</h3>
 
-          <DataTable value={ordenesActivas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="mesaId"
+          <DataTable value={ordenesActivas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="id"
             onRowToggle={(e) => setExpandedRows(e.data)} rowExpansionTemplate={rowExpansionTemplateActiva}>
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />
@@ -185,7 +186,7 @@ function MesasActivas(props) {
 
           <h3>Ordenes Pre-cerradas</h3>
 
-          <DataTable value={ordenesPreCerradas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="mesaId"
+          <DataTable value={ordenesPreCerradas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="id"
             onRowToggle={(e) => setExpandedRows(e.data)} rowExpansionTemplate={rowExpansionTemplatePreCerrada}>
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />

@@ -23,6 +23,29 @@ utils.ordenarItemsParaMostrar = (listaItems) => {
     return arrayFinal;
 }
 
+utils.ordenarSubCuentasPorIdCuenta = (cuentas) => {
+
+    let arrayFinal = [];
+
+    const agrupados = cuentas.reduce((group, product) => {
+        const { billId } = product;
+        group[billId] = group[billId] ?? [];
+        group[billId].push(product);
+        return group;
+    }, {});
+    console.log("lista", agrupados);
+
+    const keys = Object.keys(agrupados).sort();
+    console.log(keys);
+
+    for (let i = 0; i < keys.length; i++) {
+        arrayFinal.push({ nombreItem: keys[i], cantidad: agrupados[keys[i]].length });
+    }
+
+
+    return arrayFinal;
+}
+
 utils.ordenarPorNombre = (arr) => {
 
     return arr.sort((a, b) => {
