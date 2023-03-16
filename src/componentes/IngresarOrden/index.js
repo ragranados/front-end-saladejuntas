@@ -156,7 +156,7 @@ function IngresarOrden(props) {
           value={cuenta}
           options={ordenesActivas}
           onChange={(e) => setCuenta(e.value)}
-          optionLabel="id"
+          optionLabel="mesasLabel"
           optionValue="id"
         />
 

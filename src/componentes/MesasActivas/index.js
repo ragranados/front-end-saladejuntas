@@ -41,8 +41,8 @@ function MesasActivas(props) {
       setOrdenesActivas(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesActivas.data));
 
       const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerSubcuentasPorEstado(2);
-      console.log(resObtenerOrdenesPreCerradas);
-      setOrdenesPreCerradas(utils.ordenarSubCuentasPorIdCuenta(ordenesPreCerradas.data));
+      console.log(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesPreCerradas.data));
+      setOrdenesPreCerradas(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesPreCerradas.data));
 
       const resObtenerOrdenesCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(3);
       setOrdenesCerradas(resObtenerOrdenesCerradas.data);
@@ -103,6 +103,8 @@ function MesasActivas(props) {
         <div style={{ display: "flex", justifyContent: "space-between", width: "60%" }}>
           <h4>{data.nombre}</h4>
           <h4>{`$ ${data.totalSinPropina}`}</h4>
+          {/* <h4>{`$ ${data.propina}`}</h4>
+          <h4>{`$ ${data.total}`}</h4> */}
         </div>
         <div style={{ width: "70%" }} >
 
@@ -122,17 +124,23 @@ function MesasActivas(props) {
   }
 
   const tablaSubCuentaPreCerrada = (data) => {
-    console.log("Adentro", data);
+    console.log("Adentro pre", data);
 
     return (
-      <div style={{ display: "flex", justifyContent: "center", }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", width: "60%" }}>
+          <h4>{data.nombre}</h4>
+          <h4>{`$ ${data.totalSinPropina}`}</h4>
+          <h4>{`$ ${data.propina}`}</h4>
+          <h4>{`$ ${data.total}`}</h4>
+        </div>
         <div style={{ width: "70%" }} >
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button label="Cerrar Orden" onClick={async () => [setOrdenAModificar(data), setVisibleCerrar(true)]} />
           </div>
 
-          <DataTable value={data.orderItems}>
+          <DataTable value={data.subBillItems}>
             <Column body={rowTemplate} header={"Producto"} style={{ width: '5rem' }} />
             <Column field="cantidad" header="Cantidad"></Column>
           </DataTable>
@@ -156,7 +164,7 @@ function MesasActivas(props) {
   };
 
   const rowExpansionTemplatePreCerrada = (data) => {
-    console.log("Adentro", data.orderItems);
+    console.log("Adentro pre", data);
 
     return (
       <div>
@@ -173,14 +181,14 @@ function MesasActivas(props) {
   const footerContentPreCerrar = (
     <div>
       <Button label="Cancelar" icon="pi pi-times" onClick={() => [setOrdenAModificar({}), setVisiblePreCerrar(false)]} className="p-button-text" />
-      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [preCerrarOrden(), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [await preCerrarOrden(), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
     </div>
   );
 
   const footerContentCerrar = (
     <div>
       <Button label="Cancelar" icon="pi pi-times" onClick={() => [setVisibleCerrar(false), setOrdenAModificar({}), setMetodoPago(null)]} className="p-button-text" />
-      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [cerrarOrden()]} autoFocus />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [await cerrarOrden()]} autoFocus />
     </div>
   );
 
@@ -223,8 +231,8 @@ function MesasActivas(props) {
             onRowToggle={(e) => setExpandedRows(e.data)} rowExpansionTemplate={rowExpansionTemplatePreCerrada}>
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />
-            <Column field="mesaId" header="Nro de mesa"></Column>
-            <Column field="total" header="Total"></Column>
+            <Column field="mesas" header="Nro de mesa"></Column>
+            <Column field="totalSinPropina" header="Total"></Column>
           </DataTable>
 
           {/* <h3>Ordenes Cerradas</h3>
