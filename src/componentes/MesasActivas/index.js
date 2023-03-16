@@ -36,13 +36,13 @@ function MesasActivas(props) {
 
     async function fetchData() {
 
-      const resObtenerOrdenesActivas = await ServiciosOrden.obtenerOrdenesPorEstado(1);
+      const resObtenerOrdenesActivas = await ServiciosOrden.obtenerSubcuentasPorEstado(1);
       console.log("ordenes activas", utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesActivas.data));
-      setOrdenesActivas(resObtenerOrdenesActivas.data);
+      setOrdenesActivas(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesActivas.data));
 
-      const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(2);
+      const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerSubcuentasPorEstado(2);
       console.log(resObtenerOrdenesPreCerradas);
-      setOrdenesPreCerradas(resObtenerOrdenesPreCerradas.data);
+      setOrdenesPreCerradas(utils.ordenarSubCuentasPorIdCuenta(ordenesPreCerradas.data));
 
       const resObtenerOrdenesCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(3);
       setOrdenesCerradas(resObtenerOrdenesCerradas.data);
@@ -95,11 +95,15 @@ function MesasActivas(props) {
     )
   }
 
-  const rowExpansionTemplateActiva = (data) => {
+  const tablaSubCuentaActiva = (data) => {
     console.log("Adentro", data);
 
     return (
-      <div style={{ display: "flex", justifyContent: "center", }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", width: "60%" }}>
+          <h4>{data.nombre}</h4>
+          <h4>{`$ ${data.totalSinPropina}`}</h4>
+        </div>
         <div style={{ width: "70%" }} >
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -108,17 +112,17 @@ function MesasActivas(props) {
             <Button label="Pre-cerrar orden" onClick={() => [setOrdenAModificar(data), setVisiblePreCerrar(true)]} />
           </div>
 
-          <DataTable value={data.orderItems}>
+          <DataTable value={data.subBillItems}>
             <Column body={rowTemplate} header={"Producto"} style={{ width: '5rem' }} />
             <Column field="cantidad" header="Cantidad"></Column>
           </DataTable>
         </div>
       </div>
     );
-  };
+  }
 
-  const rowExpansionTemplatePreCerrada = (data) => {
-    console.log("Adentro", data.orderItems);
+  const tablaSubCuentaPreCerrada = (data) => {
+    console.log("Adentro", data);
 
     return (
       <div style={{ display: "flex", justifyContent: "center", }}>
@@ -133,6 +137,35 @@ function MesasActivas(props) {
             <Column field="cantidad" header="Cantidad"></Column>
           </DataTable>
         </div>
+      </div>
+    );
+  }
+
+  const rowExpansionTemplateActiva = (data) => {
+    console.log("adentro de row", data);
+    return (
+      <div>
+        <h4>Cuentas</h4>
+
+        {data.subCuentas.map((e) => {
+          return tablaSubCuentaActiva(e);
+        })}
+
+      </div>
+    );
+  };
+
+  const rowExpansionTemplatePreCerrada = (data) => {
+    console.log("Adentro", data.orderItems);
+
+    return (
+      <div>
+        <h4>Cuentas</h4>
+
+        {data.subCuentas.map((e) => {
+          return tablaSubCuentaPreCerrada(e);
+        })}
+
       </div>
     );
   };
@@ -176,11 +209,11 @@ function MesasActivas(props) {
 
           <h3>Ordenes activas</h3>
 
-          <DataTable value={ordenesActivas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="id"
+          <DataTable value={ordenesActivas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="billId"
             onRowToggle={(e) => setExpandedRows(e.data)} rowExpansionTemplate={rowExpansionTemplateActiva}>
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />
-            <Column field="mesaId" header="Nro de mesa"></Column>
+            <Column field="mesas" header="Nro de mesas"></Column>
             <Column field="totalSinPropina" header="Total"></Column>
           </DataTable>
 

@@ -1,14 +1,14 @@
 const servicios = {};
 
-servicios.ingresarOrden = async (nombre, mesas, items) => {
+servicios.ingresarOrden = async (cuentaId, nombre, mesas, items) => {
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/ingresar`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json", 
     },
     body: JSON.stringify({
       nombre,
-      cuentaId: null,
+      cuentaId,
       mesas,
       items,
     }),
@@ -20,6 +20,20 @@ servicios.ingresarOrden = async (nombre, mesas, items) => {
 servicios.obtenerOrdenesPorEstado = async (estado) => {
   const response = await fetch(
     `${process.env.REACT_APP_URL}/orden/porEstado?estadoId=${estado}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.json();
+};
+
+servicios.obtenerSubcuentasPorEstado = async (estado) => {
+  const response = await fetch(
+    `${process.env.REACT_APP_URL}/orden/subCuenta/porEstado?estadoId=${estado}`,
     {
       method: "GET",
       headers: {
@@ -68,15 +82,15 @@ servicios.cambiarEstado = async (ordenId, estado) => {
   return response.json();
 };
 
-servicios.preCerrarOrden = async (ordenId, metodoPagoId) => {
-  console.log({ ordenId, metodoPagoId });
+servicios.preCerrarOrden = async (subCuentaId) => {
+  console.log({ subCuentaId });
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/PreCerrar`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ordenId,
+      subCuentaId,
     }),
   });
 

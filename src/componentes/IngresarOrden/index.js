@@ -89,6 +89,7 @@ function IngresarOrden(props) {
 
   const ingresarOrden = async () => {
     const resIngresarOrden = await ServiciosOrden.ingresarOrden(
+      cuenta,
       nuevaOrden.nombre,
       nuevaOrden.mesas,
       nuevaOrden.items
