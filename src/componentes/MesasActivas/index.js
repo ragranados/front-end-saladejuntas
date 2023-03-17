@@ -66,8 +66,20 @@ function MesasActivas(props) {
 
   }, []);
 
+  const generarCuentaTicket = (infoTicket) => {
+    console.log("infoTicket",infoTicket);
+    const fileData = JSON.stringify(infoTicket);
+    const blob = new Blob([fileData], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = "cuenta.csv";
+    link.href = url;
+    link.click();
+  }
+
   const preCerrarOrden = async () => {
     const respreCerrarOrden = await ServiciosOrden.preCerrarOrden(ordenAModificar.id);
+    generarCuentaTicket(ordenAModificar);
     setVisiblePreCerrar(false);
     setActualizar(!actualizar);
   }
