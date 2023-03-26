@@ -66,20 +66,39 @@ function MesasActivas(props) {
 
   }, []);
 
-  const generarCuentaTicket = (infoTicket) => {
-    console.log("infoTicket",infoTicket);
+  const generarCuentaTicket = (infoTicket, respuesta) => {
+    let cuenta = `Cuenta de ${infoTicket.nombre},,\n`;
+    cuenta += "\n";
+    cuenta += "Item,Cantidad,Precio Unidad\n";
+    cuenta += "\n";
+
+    console.log(respuesta);
+
+    for (let i = 0; i < infoTicket.subBillItems.length; i++) {
+      cuenta += `${infoTicket.subBillItems[i].product.nombreEnFactura},${infoTicket.subBillItems[i].cantidad},${infoTicket.subBillItems[i].product.precio}\n`;
+    }
+
+    cuenta += "\n";
+    cuenta += `Sub total,,${respuesta.data.totalSinPropina.toFixed(2)}\n`;
+    cuenta += "\n";
+    cuenta += `Propina (10%),,${respuesta.data.propina.toFixed(2)}\n`;
+    cuenta += "\n";
+    cuenta += `Total,,${respuesta.data.total.toFixed(2)}\n`;
+
+    console.log("infoTicket", infoTicket, respuesta);
     const fileData = JSON.stringify(infoTicket);
-    const blob = new Blob([fileData], { type: "text/plain" });
+    const blob = new Blob([cuenta], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.download = "cuenta.csv";
+    link.download = `${infoTicket.nombre}.csv`;
     link.href = url;
     link.click();
   }
 
   const preCerrarOrden = async () => {
     const respreCerrarOrden = await ServiciosOrden.preCerrarOrden(ordenAModificar.id);
-    generarCuentaTicket(ordenAModificar);
+    console.log("respuesta", respreCerrarOrden);
+    generarCuentaTicket(ordenAModificar, respreCerrarOrden);
     setVisiblePreCerrar(false);
     setActualizar(!actualizar);
   }
