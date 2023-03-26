@@ -11,6 +11,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
+import utils from "../../utils";
 
 
 function MesasActivas(props) {
@@ -35,13 +36,13 @@ function MesasActivas(props) {
 
     async function fetchData() {
 
-      const resObtenerOrdenesActivas = await ServiciosOrden.obtenerOrdenesPorEstado(1);
-      console.log("ordenes activas", resObtenerOrdenesActivas.data);
-      setOrdenesActivas(resObtenerOrdenesActivas.data);
+      const resObtenerOrdenesActivas = await ServiciosOrden.obtenerSubcuentasPorEstado(1);
+      console.log("ordenes activas", utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesActivas.data));
+      setOrdenesActivas(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesActivas.data));
 
-      const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(2);
-      console.log(resObtenerOrdenesPreCerradas);
-      setOrdenesPreCerradas(resObtenerOrdenesPreCerradas.data);
+      const resObtenerOrdenesPreCerradas = await ServiciosOrden.obtenerSubcuentasPorEstado(2);
+      console.log(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesPreCerradas.data));
+      setOrdenesPreCerradas(utils.ordenarSubCuentasPorIdCuenta(resObtenerOrdenesPreCerradas.data));
 
       const resObtenerOrdenesCerradas = await ServiciosOrden.obtenerOrdenesPorEstado(3);
       setOrdenesCerradas(resObtenerOrdenesCerradas.data);
@@ -65,9 +66,40 @@ function MesasActivas(props) {
 
   }, []);
 
+  const generarCuentaTicket = (infoTicket, respuesta) => {
+    let cuenta = `Cuenta de ${infoTicket.nombre},,\n`;
+    cuenta += "\n";
+    cuenta += "Item,Cantidad,Precio Unidad\n";
+    cuenta += "\n";
+
+    console.log(respuesta);
+
+    for (let i = 0; i < infoTicket.subBillItems.length; i++) {
+      cuenta += `${infoTicket.subBillItems[i].product.nombreEnFactura},${infoTicket.subBillItems[i].cantidad},${infoTicket.subBillItems[i].product.precio}\n`;
+    }
+
+    cuenta += "\n";
+    cuenta += `Sub total,,${respuesta.data.totalSinPropina.toFixed(2)}\n`;
+    cuenta += "\n";
+    cuenta += `Propina (10%),,${respuesta.data.propina.toFixed(2)}\n`;
+    cuenta += "\n";
+    cuenta += `Total,,${respuesta.data.total.toFixed(2)}\n`;
+
+    console.log("infoTicket", infoTicket, respuesta);
+    const fileData = JSON.stringify(infoTicket);
+    const blob = new Blob([cuenta], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = `${infoTicket.nombre}.csv`;
+    link.href = url;
+    link.click();
+  }
+
   const preCerrarOrden = async () => {
     
     const respreCerrarOrden = await ServiciosOrden.preCerrarOrden(ordenAModificar.id);
+    console.log("respuesta", respreCerrarOrden);
+    generarCuentaTicket(ordenAModificar, respreCerrarOrden);
     setVisiblePreCerrar(false);
     setActualizar(!actualizar);
   }
@@ -95,11 +127,17 @@ function MesasActivas(props) {
     )
   }
 
-  const rowExpansionTemplateActiva = (data) => {
+  const tablaSubCuentaActiva = (data) => {
     console.log("Adentro", data);
 
     return (
-      <div style={{ display: "flex", justifyContent: "center", }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", width: "60%" }}>
+          <h4>{data.nombre}</h4>
+          <h4>{`$ ${data.totalSinPropina}`}</h4>
+          {/* <h4>{`$ ${data.propina}`}</h4>
+          <h4>{`$ ${data.total}`}</h4> */}
+        </div>
         <div style={{ width: "70%" }} >
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -108,31 +146,66 @@ function MesasActivas(props) {
             <Button label="Pre-cerrar orden" onClick={() => [setOrdenAModificar(data), setVisiblePreCerrar(true)]} />
           </div>
 
-          <DataTable value={data.orderItems}>
+          <DataTable value={data.subBillItems}>
             <Column body={rowTemplate} header={"Producto"} style={{ width: '5rem' }} />
             <Column field="cantidad" header="Cantidad"></Column>
           </DataTable>
         </div>
       </div>
     );
-  };
+  }
 
-  const rowExpansionTemplatePreCerrada = (data) => {
-    console.log("Adentro", data.orderItems);
+  const tablaSubCuentaPreCerrada = (data) => {
+    console.log("Adentro pre", data);
 
     return (
-      <div style={{ display: "flex", justifyContent: "center", }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", width: "60%" }}>
+          <h4>{data.nombre}</h4>
+          <h4>{`$ ${data.totalSinPropina}`}</h4>
+          <h4>{`$ ${data.propina}`}</h4>
+          <h4>{`$ ${data.total}`}</h4>
+        </div>
         <div style={{ width: "70%" }} >
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button label="Cerrar Orden" onClick={async () => [setOrdenAModificar(data), setVisibleCerrar(true)]} />
           </div>
 
-          <DataTable value={data.orderItems}>
+          <DataTable value={data.subBillItems}>
             <Column body={rowTemplate} header={"Producto"} style={{ width: '5rem' }} />
             <Column field="cantidad" header="Cantidad"></Column>
           </DataTable>
         </div>
+      </div>
+    );
+  }
+
+  const rowExpansionTemplateActiva = (data) => {
+    console.log("adentro de row", data);
+    return (
+      <div>
+        <h4>Cuentas</h4>
+
+        {data.subCuentas.map((e) => {
+          return tablaSubCuentaActiva(e);
+        })}
+
+      </div>
+    );
+  };
+
+  const rowExpansionTemplatePreCerrada = (data) => {
+    console.log("Adentro pre", data);
+
+    return (
+      <div>
+        <h4>Cuentas</h4>
+
+        {data.subCuentas.map((e) => {
+          return tablaSubCuentaPreCerrada(e);
+        })}
+
       </div>
     );
   };
@@ -140,14 +213,14 @@ function MesasActivas(props) {
   const footerContentPreCerrar = (
     <div>
       <Button label="Cancelar" icon="pi pi-times" onClick={() => [setOrdenAModificar({}), setVisiblePreCerrar(false)]} className="p-button-text" />
-      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [preCerrarOrden(), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [await preCerrarOrden(), setActualizar(!actualizar), setVisiblePreCerrar(false), setOrdenAModificar({})]} autoFocus />
     </div>
   );
 
   const footerContentCerrar = (
     <div>
       <Button label="Cancelar" icon="pi pi-times" onClick={() => [setVisibleCerrar(false), setOrdenAModificar({}), setMetodoPago(null)]} className="p-button-text" />
-      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [cerrarOrden()]} autoFocus />
+      <Button label="Confirmar" icon="pi pi-check" onClick={async () => [await cerrarOrden()]} autoFocus />
     </div>
   );
 
@@ -176,22 +249,22 @@ function MesasActivas(props) {
 
           <h3>Ordenes activas</h3>
 
-          <DataTable value={ordenesActivas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="mesaId"
+          <DataTable value={ordenesActivas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="billId"
             onRowToggle={(e) => setExpandedRows(e.data)} rowExpansionTemplate={rowExpansionTemplateActiva}>
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />
-            <Column field="mesaId" header="Nro de mesa"></Column>
+            <Column field="mesas" header="Nro de mesas"></Column>
             <Column field="totalSinPropina" header="Total"></Column>
           </DataTable>
 
           <h3>Ordenes Pre-cerradas</h3>
 
-          <DataTable value={ordenesPreCerradas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="mesaId"
+          <DataTable value={ordenesPreCerradas} tableStyle={{ minWidth: '50rem' }} expandedRows={expandedRows} dataKey="id"
             onRowToggle={(e) => setExpandedRows(e.data)} rowExpansionTemplate={rowExpansionTemplatePreCerrada}>
             <Column expander={true} style={{ width: '5rem' }} />
             <Column style={{ width: '5rem' }} />
-            <Column field="mesaId" header="Nro de mesa"></Column>
-            <Column field="total" header="Total"></Column>
+            <Column field="mesas" header="Nro de mesa"></Column>
+            <Column field="totalSinPropina" header="Total"></Column>
           </DataTable>
 
           {/* <h3>Ordenes Cerradas</h3>
