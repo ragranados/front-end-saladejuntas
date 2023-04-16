@@ -14,6 +14,9 @@ import { Dropdown } from 'primereact/dropdown';
 import utils from "../../utils";
 
 
+import { Checkbox } from 'primereact/checkbox';
+
+
 function MesasActivas(props) {
   const [visiblePreCerrar, setVisiblePreCerrar] = useState(false);
   const [visibleCerrar, setVisibleCerrar] = useState(false);
@@ -21,6 +24,8 @@ function MesasActivas(props) {
   const [ordenesActivas, setOrdenesActivas] = useState([]);
   const [ordenesPreCerradas, setOrdenesPreCerradas] = useState([]);
   const [ordenesCerradas, setOrdenesCerradas] = useState([]);
+
+  const [anular, setAnular] = useState(false);
 
   const [expandedRows, setExpandedRows] = useState(null);
 
@@ -96,7 +101,7 @@ function MesasActivas(props) {
   }
 
   const preCerrarOrden = async () => {
-    
+
     const respreCerrarOrden = await ServiciosOrden.preCerrarOrden(ordenAModificar.id);
     console.log("respuesta", respreCerrarOrden);
     generarCuentaTicket(ordenAModificar, respreCerrarOrden);
@@ -112,7 +117,7 @@ function MesasActivas(props) {
       return;
     }
 
-    const resCerrarOrden = await ServiciosOrden.cerrarOrden(ordenAModificar.id, metodoPago);
+    const resCerrarOrden = await ServiciosOrden.cerrarOrden(ordenAModificar.id, metodoPago, anular);
     setVisibleCerrar(false);
     setMetodoPago(null);
     setActualizar(!actualizar);
@@ -241,6 +246,11 @@ function MesasActivas(props) {
         <h2>Escoger metodo de pago</h2>
 
         <Dropdown options={metodosPago} value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} optionLabel="nombre" optionValue="id" />
+
+        <h2>Anular Orden</h2>
+
+        <Checkbox onChange={e => setAnular(e.checked)} checked={anular} />
+
       </Dialog>
 
       {

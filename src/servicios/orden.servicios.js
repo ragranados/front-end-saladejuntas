@@ -4,7 +4,7 @@ servicios.ingresarOrden = async (cuentaId, nombre, mesas, items) => {
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/ingresar`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json", 
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       nombre,
@@ -97,8 +97,8 @@ servicios.preCerrarOrden = async (subCuentaId) => {
   return response.json();
 };
 
-servicios.cerrarOrden = async (ordenId, metodoPagoId) => {
-  console.log({ ordenId, metodoPagoId });
+servicios.cerrarOrden = async (ordenId, metodoPagoId, anular = false) => {
+  console.log({ ordenId, metodoPagoId, anular });
   const response = await fetch(`${process.env.REACT_APP_URL}/orden/cerrar`, {
     method: "PUT",
     headers: {
@@ -107,6 +107,7 @@ servicios.cerrarOrden = async (ordenId, metodoPagoId) => {
     body: JSON.stringify({
       ordenId,
       metodoPagoId,
+      anular
     }),
   });
 
